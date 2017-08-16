@@ -1,4 +1,4 @@
-package jp.alhinc.ito_kenta.calculate_sales;
+package jp.alhinc.ito_kenta.Calculate_sales;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,19 +17,20 @@ public class sales{
 		HashMap<String, Long> commoditymap1 = new HashMap<String, Long>();
 		List<File> rcdfile = new ArrayList<File>();
 
-		//まずbranch の処理
-		try {
 
+		//まずbranch の処理
+		BufferedReader br = null;
+		try {
 			File file1 = new File(args[0],"branch.lst");
 			FileReader fr = new FileReader(file1);
-			BufferedReader br = new BufferedReader(fr);
+			 br = new BufferedReader(fr);
 			String s;
 
 			//支店定義ファイルがなければエラー
 			if(file1.exists()){
 			}else{
 				System.out.println("支店定義ファイルが存在しません");
-				System.exit(0);
+				return;
 			}
 
 			//読み込んだファイルがnullになるまで、一行ずつ繰り返し抽出する
@@ -37,63 +38,58 @@ public class sales{
 				String branch[] = s.split(",");
 
 				//branchの要素数が2でない（=支店名にカンマが含まれない文字列）でなければエラー
-				if(branch.length==2){
-				}else{
+				if(branch.length !=2){
 					System.out.println("支店定義ファイルのフォーマットが不正です");
-					System.exit(0);
+					return;
 				}
 
                 //matchesを使いbranch[0]が「数字のみ。3桁固定」でなければエラーが出る
 				String str =branch[0];
 		        if(str.matches("\\d{3}")){
-		        } else {
+		        }else{
 		        	System.out.println("支店定義ファイルのフォーマットが不正です");
-		        	System.exit(0);
-		        }
-
-	        	//matchesを使いbranch[1]が「カンマ、改行を含まない文字列」でなければエラーが出る
-				String strin =branch[1];
-		        if(strin.matches("^(?!.*(,|\\r\\n)).*$")){
-		        } else {
-		        	System.out.println("支店定義ファイルのフォーマットが不正です");
-		        	System.exit(0);
+		        	return;
 		        }
 
 		        //branchmapに"支店コード"と"支店名"を
 				branchmap.put(branch[0], branch[1]);
 				//branchmap1に"支店コード"と"売上合計金額(初期値=0)"を入れる
 				branchmap1.put(branch[0],(long) 0);
-
 			}
-			br.close();
-
 		}catch(IOException e){
 			System.out.println("予期せぬエラーが発生しました");
-			System.exit(0);
+			return;
+		}finally{
+			if(br != null){
+				try{
+					br.close();
+				} catch(IOException e){
+				}
+			}
 		}
 
 		//commodityの処理を同じく行う
+		BufferedReader br1 = null;
 		try {
 			File file2 = new File(args[0],"commodity.lst");
-			FileReader fr = new FileReader(file2);
-			BufferedReader br = new BufferedReader(fr);
+			FileReader fr1 = new FileReader(file2);
+			br1 = new BufferedReader(fr1);
 			String r;
 
 			//商品定義ファイルがなければエラー
 			if(file2.exists()){
 			}else{
 				System.out.println("商品定義ファイルが存在しません");
-				System.exit(0);
+				return;
 			}
 
-			while((r = br.readLine()) !=null){
+			while((r = br1.readLine()) !=null){
 				String commodity[] = r.split(",");
 
 				//commodityの要素数が2でない（=商品名にカンマが含まれれない文字列）でなければエラー
-				if(commodity.length==2){
-				}else{
+				if(commodity.length!=2){
 					System.out.println("商品定義ファイルのフォーマットが不正です");
-					System.exit(0);
+
 				}
 
 				//matchesを使いcommodity[0]が「アルファベットと数字。8桁固定」でなければエラーが出る
@@ -101,30 +97,27 @@ public class sales{
 		        if(str.matches("^[a-zA-Z0-9]{8}$")){
 		        } else {
 		        	System.out.println("商品定義ファイルのフォーマットが不正です");
-		        	System.exit(0);
+
 		        }
 
-		      //matchesを使いcommodity[1]が「カンマ、改行を含まない文字列」でなければエラーが出る
-				String stri =commodity[1];
-		        if(stri.matches("^(?!.*(,|\\r\\n)).*$")){
-		        } else {
-		        	System.out.println("商品定義ファイルのフォーマットが不正です");
-		        	System.exit(0);
-		        }
 
 		        //commoditymapに"商品コード"と"商品名"を
 				commoditymap.put(commodity[0], commodity[1]);
 				//commoditymap1に"商品コード"と"売上合計金額(初期値=0)"を入れる
 				commoditymap1.put(commodity[0], (long)0);
-
 			}
-			br.close();
 
-		}catch(IOException f){
+		}catch(IOException e){
 			System.out.println("予期せぬエラーが発生しました");
-			System.exit(0);
+			return;
+		}finally{
+			if(br1 != null){
+				try{
+					br1.close();
+				} catch(IOException e){
+				}
+			}
 		}
-
 
 
 
@@ -151,10 +144,9 @@ public class sales{
 			String str2 = index2.substring(1, 8);
 			int num2 = Integer.parseInt(str2);
 
-			if(num2-num==1){
-			}else{
+			if(num2-num!=1){
 				System.out.println("売上ファイル名が連番になっていません");
-				System.exit(0);
+
 			}
 	    }
 
@@ -162,128 +154,156 @@ public class sales{
 	    //「売上ファイル」をひとつずつ以下の処理
 	    for (int i = 0; i < rcdfile.size(); i++) {
 
+	    	BufferedReader br2 = null;
 	    	try {
 	    		//まず、「売上ファイル」をArrayListに格納する
 	    		ArrayList<String> sold = new ArrayList<String>();
 	    		FileReader sr = new FileReader(rcdfile.get(i));
-	    		BufferedReader br = new BufferedReader(sr);
+	    		br2 = new BufferedReader(sr);
 	    		String str;
-	    		while((str = br.readLine()) !=null){
+	    		while((str = br2.readLine()) !=null){
 		    		sold.add(str);
 	    		}
 
 	    		//売上ファイルの中身が4行以上の場合エラー
-				if(sold.size()>=3){
-				}else{
+				if(sold.size()!=3){
 					System.out.println("該当ファイルのフォーマットが不正です");
-					System.exit(0);
+					return;
 				}
 
 				//売上ファイルの支店コードがbranch.lstに該当がなかった場合エラー
 	    		if(branchmap.get(sold.get(0))==null){
 	    			System.out.println(files[i].getName()+"の支店コードが不正です");
-	    			System.exit(0);
+	    			return;
 	    		}
 
 	    		//Stirng型のAllayListの金額部分をLong型に変換（=sold1）。
 	    		//branchmap1におけるsold1の支店コードに対応する金額＋上記
 	    		long sold1 = Long.parseLong(sold.get(2));
 	    		long branchsum = branchmap1.get(sold.get(0)) + sold1;
-	    		branchmap1.put(sold.get(0), branchsum);
-
 
 	    		//branchsumが10桁を超えた場合、エラーにする
 	    		String branchsumSt = Long.toString(branchsum);
 	    		if(branchsumSt.matches("\\d{1,10}")){
 	    		}else{
 	    			System.out.println("合計金額が10桁を超えました");
-	    			System.exit(0);
+	    			return;
 	    		}
+
+	    		branchmap1.put(sold.get(0), branchsum);
+
 
 
 
 	    		//売上ファイルの商品コードがcommodity.lstに該当がなかった場合エラー
 	    		if(commoditymap.get(sold.get(1))==null){
 	    			System.out.println(files[i].getName()+"の商品コードが不正です");
-	    			System.exit(0);
+	    			return;
 	    		}
 
 	    		//Stirng型のAllayListの金額部分をLong型に変換（=sold2）。
 	    		//commoditymap1におけるsold2の支店コードに対応する金額＋上記がcommoditysum
 	    		long sold2 = Long.parseLong(sold.get(2));
 	    		long commoditysum = commoditymap1.get(sold.get(1)) + sold2;
-	    		commoditymap1.put(sold.get(1), commoditysum);
 
 	    		//commoditysumが10桁を超えた場合、エラーにする
 	    		String commoditysumSt = Long.toString(commoditysum);
 	    		if(commoditysumSt.matches("\\d{1,10}")){
 	    		}else{
 	    			System.out.println("合計金額が10桁を超えました");
-	    			System.exit(0);
+	    			return;
 	    		}
 
-	    		br.close();
+	    		commoditymap1.put(sold.get(1), commoditysum);
+
+
+
 			}catch(IOException e){
 				System.out.println("予期せぬエラーが発生しました");
-				System.exit(0);
+				return;
+			}finally{
+				if(br2 != null){
+					try{
+						br2.close();
+					} catch(IOException e){
+					}
+				}
 			}
 	    }
 
 
 	    //支店別集計ファイルを売上金額で降順にする
 	    List<Map.Entry<String,Long>> entries1 =new ArrayList<Map.Entry<String,Long>>(branchmap1.entrySet());
-	        Collections.sort(entries1, new Comparator<Map.Entry<String,Long>>() {
+	        Collections.sort
+	        	(entries1, new Comparator<Map.Entry<String,Long>>() {
 
-	            @Override
-	            public int compare(
-	                  Map.Entry<String,Long> entry1, Map.Entry<String,Long> entry2) {
-	                return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
-	            }
-	        });
+	        		@Override
+	        		public int compare(Map.Entry<String,Long> entry1, Map.Entry<String,Long> entry2) {
+	        			return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
+	        		}
+	        	});
 
+	        BufferedWriter bw = null;
 	        //支店別集計を降順にしたものを、branch.outファイルに出力する
 	        try{
             	File branchoutfile = new File(args[0],"branch.out");
             	FileWriter fw = new FileWriter(branchoutfile);
-            	BufferedWriter bw = new BufferedWriter(fw);
+            	bw = new BufferedWriter(fw);
 
             	for (Map.Entry<String,Long> s : entries1) {
-            	bw.write(s.getKey()+","+branchmap.get(s.getKey())+","+s.getValue()+ "\n");
+            		bw.write(s.getKey()+","+branchmap.get(s.getKey())+","+s.getValue());
+            		bw.newLine();
             	}
-            	bw.close();
+
 
             }catch (IOException e){
             	System.out.println("予期せぬエラーが発生しました");
-            	System.exit(0);
-            }
+            	return;
+            }finally{
+    			if(bw != null){
+    				try{
+    					bw.close();
+    				} catch(IOException e){
+    				}
+    			}
+    		}
 
 
 	     //商品別集計ファイルを売上金額で降順にする
 	    List<Map.Entry<String,Long>> entries2 =new ArrayList<Map.Entry<String,Long>>(commoditymap1.entrySet());
-		    Collections.sort(entries2, new Comparator<Map.Entry<String,Long>>() {
+		    Collections.sort
+		    	(entries2, new Comparator<Map.Entry<String,Long>>() {
 
-		       @Override
-		       public int compare(
-		              Map.Entry<String,Long> entry3, Map.Entry<String,Long> entry4) {
-		            return ((Long)entry4.getValue()).compareTo((Long)entry3.getValue());
-		        }
-		    });
+		    		@Override
+		    		public int compare(Map.Entry<String,Long> entry3, Map.Entry<String,Long> entry4) {
+		    			return ((Long)entry4.getValue()).compareTo((Long)entry3.getValue());
+		    		}
+		    	});
 
+		    BufferedWriter bw1 = null;
 		    //商品別集計を降順にしたものを、commodity.outファイルに出力する
 		    try{
             	File commodityoutfile = new File(args[0],"commodity.out");
             	FileWriter fw = new FileWriter(commodityoutfile);
-            	BufferedWriter bw = new BufferedWriter(fw);
+            	bw1 = new BufferedWriter(fw);
 
             	for (Map.Entry<String,Long> s : entries2) {
-            	bw.write(s.getKey()+","+commoditymap.get(s.getKey())+","+s.getValue()+ "\n");
+            		bw1.write(s.getKey()+","+commoditymap.get(s.getKey())+","+s.getValue());
+            		bw1.newLine();
             	}
-            	bw.close();
+
 
             }catch (IOException e){
             	System.out.println("予期せぬエラーが発生しました");
-            	System.exit(0);
-		    }
+            	return;
+            }finally{
+    			if(bw1 != null){
+    				try{
+    					bw1.close();
+    				} catch(IOException e){
+    				}
+    			}
+    		}
 	}
 }
 
