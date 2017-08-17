@@ -130,7 +130,7 @@ public class CalculateSales{
 		//「売上集計」のディレクトリから、売上ファイル(数字8桁＆末尾.rcd)かつファイル形式のものを抽出する
 		for (int i = 0; i < files.length; i++) {
 
-			if(files[i].getName().matches("^\\d{8}.rcd$")||!files[i].isFile()){
+			if(files[i].getName().matches("^\\d{8}.rcd$")&&!files[i].isFile()){
 				rcdfile.add(files[i]);
 			}
 		}
