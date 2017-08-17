@@ -127,17 +127,11 @@ public class CalculateSales{
 		File dir = new File(dire);
 		File[] files = dir.listFiles();
 
-		//「売上集計」のディレクトリから、売上ファイル(数字8桁＆末尾.rcd)を抽出する
+		//「売上集計」のディレクトリから、売上ファイル(数字8桁＆末尾.rcd)かつファイル形式のものを抽出する
 		for (int i = 0; i < files.length; i++) {
 
-			if(files[i].getName().matches("^\\d{8}.rcd$")){
+			if(files[i].getName().matches("^\\d{8}.rcd$")||!files[i].isFile()){
 				rcdfile.add(files[i]);
-			}
-
-			//売上集計ディレクトリから抽出した、(数字8桁＆末尾.rcd)の売上ファイルが、ファイル形式でなければエラー
-			if (!files[i].isFile()){
-				System.out.println("売上ファイル名が連番になっていません");
-				return;
 			}
 		}
 
