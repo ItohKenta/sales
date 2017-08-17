@@ -34,14 +34,17 @@ public class CalculateSales{
 		BufferedReader br = null;
 		try {
 			File file1 = new File(args[0],"branch.lst");
-			br = new BufferedReader(new FileReader(file1));
-			String s;
 
 			//支店定義ファイルがなければエラー
-			if(!file1.exists()){
+			if(! file1.exists()){
 				System.out.println("支店定義ファイルが存在しません");
 				return;
 			}
+
+			br = new BufferedReader(new FileReader(file1));
+			String s;
+
+
 
 			//読み込んだファイルがnullになるまで、一行ずつ繰り返し抽出する
 			while((s = br.readLine()) !=null){
@@ -76,14 +79,16 @@ public class CalculateSales{
 		//commodityの処理を同じく行う
 		try {
 			File file2 = new File(args[0],"commodity.lst");
-			br = new BufferedReader(new FileReader(file2));
-			String r;
 
 			//商品定義ファイルがなければエラー
 			if(!file2.exists()){
 				System.out.println("商品定義ファイルが存在しません");
 				return;
 			}
+
+			br = new BufferedReader(new FileReader(file2));
+			String r;
+
 
 			while((r = br.readLine()) !=null){
 				String commodity[] = r.split(",");
@@ -169,8 +174,14 @@ public class CalculateSales{
 				}
 
 				//売上ファイルの中身が3行でない場合エラー
-				if(sold.size()!=3||!sold.get(2).matches("\\d+")){
+				if(sold.size()!=3){
 					System.out.println(rcdfile.get(i).getName()+"のフォーマットが不正です");
+					return;
+				}
+
+				//売上ファイルの金額部分が数値でなければエラー
+				if(!sold.get(2).matches("\\d+")){
+					System.out.println("予期せぬエラーが発生しました");
 					return;
 				}
 
