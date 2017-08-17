@@ -126,18 +126,21 @@ public class CalculateSales{
 		String dire = args[0];
 		File dir = new File(dire);
 		File[] files = dir.listFiles();
+
 		//「売上集計」のディレクトリから、売上ファイル(数字8桁＆末尾.rcd)を抽出する
 		for (int i = 0; i < files.length; i++) {
-			if(files[i].getName().matches("^\\d{8}$*.rcd.*")){
-				rcdfile.add(files[i]);
 
-				//売上集計ディレクトリから抽出した、(数字8桁＆末尾.rcd)の売上ファイルが、ファイル形式でなければエラー
-				if (!rcdfile.get(i).isFile()){
-					System.out.println("売上ファイル名が連番になっていません");
-					return;
-				}
+			if(files[i].getName().matches("^\\d{8}.rcd$")){
+				rcdfile.add(files[i]);
+			}
+
+			//売上集計ディレクトリから抽出した、(数字8桁＆末尾.rcd)の売上ファイルが、ファイル形式でなければエラー
+			if (!files[i].isFile()){
+				System.out.println("売上ファイル名が連番になっていません");
+				return;
 			}
 		}
+
 
 		//売上ファイルの連番チェック。差分が1なら連番になっていると考える
 		//for文に-1をつけないと、files[i+1]が、無い範囲をしていすることになるので注意。
@@ -326,4 +329,3 @@ public class CalculateSales{
 		}
 	}
 }
-
