@@ -1,4 +1,4 @@
-package jp.alhinc.ito_kenta.CalculateSales;
+package jp.alhinc.ito_kenta.calculate_sales;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,8 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 public class CalculateSales{
-	@SuppressWarnings("resource")
 	public static void main(String[] args){
+
+		if(args.length !=1){
+			System.out.println("予期せぬエラーが発生しました");
+			return;
+		}
+
 		//宣言
 		HashMap<String, String> branchmap = new HashMap<String, String>();
 		HashMap<String, String> commoditymap = new HashMap<String, String>();
@@ -23,8 +28,7 @@ public class CalculateSales{
 		BufferedReader br = null;
 		try {
 			File file1 = new File(args[0],"branch.lst");
-			FileReader fr = new FileReader(file1);
-			 br = new BufferedReader(fr);
+			 br = new BufferedReader(new FileReader(file1));
 			String s;
 
 			//支店定義ファイルがなければエラー
@@ -72,11 +76,9 @@ public class CalculateSales{
 		}
 
 		//commodityの処理を同じく行う
-		BufferedReader br1 = null;
 		try {
 			File file2 = new File(args[0],"commodity.lst");
-			FileReader fr1 = new FileReader(file2);
-			br1 = new BufferedReader(fr1);
+			br = new BufferedReader(new FileReader(file2));
 			String r;
 
 			//商品定義ファイルがなければエラー
@@ -86,7 +88,7 @@ public class CalculateSales{
 				return;
 			}
 
-			while((r = br1.readLine()) !=null){
+			while((r = br.readLine()) !=null){
 				String commodity[] = r.split(",");
 
 				//commodityの要素数が2でない（=商品名にカンマが含まれれない文字列）でなければエラー
@@ -114,9 +116,9 @@ public class CalculateSales{
 			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}finally{
-			if(br1 != null){
+			if(br != null){
 				try{
-					br1.close();
+					br.close();
 				} catch(IOException e){
 					System.out.println("予期せぬエラーが発生しました");
 					return;
@@ -134,6 +136,12 @@ public class CalculateSales{
 	    for (int i = 0; i < files.length; i++) {
 	        if(files[i].getName().matches("^\\d{8}$*.rcd.*")){
 	        	rcdfile.add(files[i]);
+
+	        	if (rcdfile.get(i).isFile()){
+				}else{
+					System.out.println("売上ファイル名が連番になっていません");
+					return;
+				}
 	        }
 	    }
 
@@ -141,14 +149,15 @@ public class CalculateSales{
 	    //for文に-1をつけないと、files[i+1]が、無い範囲をしていすることになるので注意。
 	    for (int i =0; i < rcdfile.size()-1; i++) {
 
-	    	String index = files[i].getName();
+	    	String index = rcdfile.get(i).getName();
 			String str1 = index.substring(1, 8);
 			int num = Integer.parseInt(str1);
 
-			String index2 = files[i+1].getName();
+			String index2 = rcdfile.get(i+1).getName();
 			String str2 = index2.substring(1, 8);
 			int num2 = Integer.parseInt(str2);
 
+			//売上ファイル名が
 			if(num2-num!=1){
 				System.out.println("売上ファイル名が連番になっていません");
 				return;
@@ -159,26 +168,26 @@ public class CalculateSales{
 	    //「売上ファイル」をひとつずつ以下の処理
 	    for (int i = 0; i < rcdfile.size(); i++) {
 
-	    	BufferedReader br2 = null;
+
 	    	try {
 	    		//まず、「売上ファイル」をArrayListに格納する
 	    		ArrayList<String> sold = new ArrayList<String>();
 	    		FileReader sr = new FileReader(rcdfile.get(i));
-	    		br2 = new BufferedReader(sr);
+	    		br = new BufferedReader(sr);
 	    		String str;
-	    		while((str = br2.readLine()) !=null){
+	    		while((str = br.readLine()) !=null){
 		    		sold.add(str);
 	    		}
 
 	    		//売上ファイルの中身が4行以上の場合エラー
 				if(sold.size()!=3){
-					System.out.println("該当ファイルのフォーマットが不正です");
+					System.out.println(rcdfile.get(i).getName()+"のフォーマットが不正です");
 					return;
 				}
 
 				//売上ファイルの支店コードがbranch.lstに該当がなかった場合エラー
 	    		if(branchmap.get(sold.get(0))==null){
-	    			System.out.println(files[i].getName()+"の支店コードが不正です");
+	    			System.out.println(rcdfile.get(i).getName()+"の支店コードが不正です");
 	    			return;
 	    		}
 
@@ -202,7 +211,7 @@ public class CalculateSales{
 
 	    		//売上ファイルの商品コードがcommodity.lstに該当がなかった場合エラー
 	    		if(commoditymap.get(sold.get(1))==null){
-	    			System.out.println(files[i].getName()+"の商品コードが不正です");
+	    			System.out.println(rcdfile.get(i).getName()+"の商品コードが不正です");
 	    			return;
 	    		}
 
@@ -227,9 +236,9 @@ public class CalculateSales{
 				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}finally{
-				if(br2 != null){
+				if(br != null){
 					try{
-						br2.close();
+						br.close();
 					} catch(IOException e){
 						System.out.println("予期せぬエラーが発生しました");
 						return;
