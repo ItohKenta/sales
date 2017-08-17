@@ -1,0 +1,12 @@
+class VariableExample {
+	public static void main(String[] args){
+		for(int i=1;a<=9;a++){
+		    for(int j = 1;j<=9;j++){
+		    	int value=i*j;
+		    	System.out.println(j+"×"+i+"="+value);
+		    	System.out.println("  ");
+		    }
+		    System.out.println("");
+		} 
+	}
+}

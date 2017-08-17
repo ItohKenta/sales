@@ -1,0 +1,5 @@
+class VariableExample {
+	public static void main(String[] args){
+		System.out.println("計算結果は"5 * 3.14);
+	}
+}
