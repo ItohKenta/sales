@@ -1,6 +1,0 @@
-class VariableExample {
-	public static void main(String[] args){
-		double d = 5 * 3.14;
-		System.out.println("計算結果は"+ d);
-	}
-}

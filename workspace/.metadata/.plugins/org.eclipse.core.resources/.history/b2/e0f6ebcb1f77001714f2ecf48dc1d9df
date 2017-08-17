@@ -1,8 +1,0 @@
-class VariableExample {
-	public static void main(String[] args){
-		int i = 7;
-		int j = 2;
-		double d =(double)i/(double)j;
-		System.out.println(d);
-	}
-}

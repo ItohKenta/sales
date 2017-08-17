@@ -1,7 +1,0 @@
-class VariableExample {
-	public static void main(String[] args){
-		String message1 = "こんにちは。";
-		String message2 = "今日はいい天気ですね";
-		System.out.println(message1+message2);
-	}
-}
